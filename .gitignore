@@ -1,0 +1,12 @@
+
+# node_modules
+node_modules
+
+#tmp
+tmp/database.sqlite
+
+#.env
+.env
+
+#migrations
+src/database/migrations
