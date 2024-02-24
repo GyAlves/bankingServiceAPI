@@ -5,10 +5,13 @@ import knex from '../../database/database.config';
 // models 
 import { Customer } from "../../models/Customer";
 
-// repositories
-import { CustomersRepository } from '../customers-repository'
+// interfaces
+import IStartCustomerRegistration from "../../interfaces/start-customer-registration-interface";
 
-export class KnexCustomersRepository implements CustomersRepository {
+// repositories
+import { ICustomersRepository } from '../customers-repository'
+
+export class KnexCustomersRepository implements ICustomersRepository {
 
     async findById(id: string): Promise<Customer | any> {
 
@@ -17,6 +20,12 @@ export class KnexCustomersRepository implements CustomersRepository {
         const customer = await query.where("id", "=", id).select("*");
 
         return customer;
+
+    }
+
+    async customerRegistration(registration: IStartCustomerRegistration): Promise<void> {
+
+        await knex("start-customer-registration").insert(registration);
 
     }
 }
