@@ -2,7 +2,7 @@
 import { randomUUID } from 'crypto';
 
 // repositories
-import { ICustomersRepository } from "../repositories/customers-repository";
+import { ICustomersRepository } from "../repositories/customers-repository-interface";
 
 // error-handling
 
@@ -24,10 +24,11 @@ export class StartCustomerRegistrationUseCase {
         }
 
         const startRegistration = {
+            id: randomUUID(),
             sessionId: randomUUID(),
-            customerCpfNumber: customer_cpf.toString(),
-            CustomerRegistrationStep: "0",
-            CustomerRegistrationStatus: "inProgress",
+            customer_cpf: customer_cpf.toString(),
+            customer_registration_step: "0",
+            customer_registration_status: "inProgress",
         }
 
         await this.customersRepository.customerRegistration(startRegistration);

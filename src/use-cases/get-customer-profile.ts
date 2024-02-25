@@ -1,6 +1,6 @@
 
 // repositories
-import { CustomersRepository } from "../repositories/customers-repository";
+import { ICustomersRepository } from "../repositories/customers-repository-interface";
 
 // model
 import { Customer } from "../models/Customer";
@@ -9,7 +9,7 @@ import { Customer } from "../models/Customer";
 
 // interfaces
 interface IGetCustomerProfileUseCaseRequest {
-    customer_id: string
+    customer_cpf: string
 }
 
 interface IGetCustomerProfileUseCaseResponse {
@@ -18,14 +18,14 @@ interface IGetCustomerProfileUseCaseResponse {
 
 export class GetCustomerProfileUseCase {
 
-    constructor(private customersRepository: CustomersRepository) { }
+    constructor(private customersRepository: ICustomersRepository) { }
 
-    async execute({ customer_id }: IGetCustomerProfileUseCaseRequest): Promise<IGetCustomerProfileUseCaseResponse> {
+    async execute({ customer_cpf }: IGetCustomerProfileUseCaseRequest): Promise<IGetCustomerProfileUseCaseResponse> {
 
-        const customer = await this.customersRepository.findById(customer_id);
+        const customer = await this.customersRepository.findById(customer_cpf);
 
-        if (!customer) {
-            console.log("Customer not found")
+        if (!customer?.id) {
+            throw new Error("Customer not found")
         }
 
         return {

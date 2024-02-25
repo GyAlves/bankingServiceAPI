@@ -1,7 +1,7 @@
 
 // dependencies 
 import { FastifyReply, FastifyRequest } from 'fastify';
-import { z } from 'zod'
+import { z } from 'zod';
 
 // use-cases
 import { makeStartCustomerRegistrationUseCase } from "../../../use-cases/factories/make-start-customer-registation-use-case";

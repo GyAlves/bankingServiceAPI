@@ -4,12 +4,10 @@ import knex from '../../database/database.config';
 
 // models 
 import { Customer } from "../../models/Customer";
-
-// interfaces
-import IStartCustomerRegistration from "../../interfaces/start-customer-registration-interface";
+import { CustomerStartRegistration } from "../../models/CustomerStartRegistration";
 
 // repositories
-import { ICustomersRepository } from '../customers-repository'
+import { ICustomersRepository } from '../customers-repository-interface'
 
 export class KnexCustomersRepository implements ICustomersRepository {
 
@@ -23,9 +21,25 @@ export class KnexCustomersRepository implements ICustomersRepository {
 
     }
 
-    async customerRegistration(registration: IStartCustomerRegistration): Promise<void> {
+    async customerRegistration(registration: CustomerStartRegistration): Promise<void> {
 
         await knex("start-customer-registration").insert(registration);
+
+    }
+
+    async findRegistrationBySessionId(session_id: string | null): Promise<CustomerStartRegistration[] | []> {
+
+        const query = knex("start-customer-registration").select();
+
+        const customerRegistration = await query.where("sessionId", "=", session_id).select("*");
+
+        return customerRegistration;
+
+    }
+
+    async updateCustomerRegistration(registration: CustomerStartRegistration): Promise<void> {
+
+        await knex("start-customer-registration").where("sessionId", "=", registration.sessionId).update(registration);
 
     }
 }
