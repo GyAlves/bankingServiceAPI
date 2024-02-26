@@ -5,6 +5,7 @@ import { randomUUID } from 'crypto';
 import { ICustomersRepository } from "../repositories/customers-repository-interface";
 
 // error-handling
+import { CustomerNotFoundByCpfError } from './errors/customer-not-found-by-cpf-error';
 
 // interfaces
 interface IGetCustomerProfileUseCaseRequest {
@@ -20,7 +21,7 @@ export class StartCustomerRegistrationUseCase {
         const customer = await this.customersRepository.findById(customer_cpf);
 
         if (customer?.id) {
-            throw new Error("Customer already exists");
+            throw new CustomerNotFoundByCpfError();
         }
 
         const startRegistration = {

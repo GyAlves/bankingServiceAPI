@@ -6,6 +6,9 @@ import { z } from 'zod';
 // use-cases
 import { makeStartCustomerRegistrationUseCase } from "../../../use-cases/factories/make-start-customer-registation-use-case";
 
+// error-handling
+import { CustomerNotFoundByCpfError } from '../../../use-cases/errors/customer-not-found-by-cpf-error';
+
 export async function startRegistration(request: FastifyRequest, reply: FastifyReply) {
 
     try {
@@ -31,7 +34,11 @@ export async function startRegistration(request: FastifyRequest, reply: FastifyR
 
     } catch (err) {
 
-        console.log(err);
+        if (err instanceof CustomerNotFoundByCpfError) {
+            return reply.status(404).send({ message: "Customer not found" });
+        }
+
+        reply.status(400).send({ message: "Error finding customer", error: err });
 
     }
 }

@@ -6,6 +6,7 @@ import { ICustomersRepository } from "../repositories/customers-repository-inter
 import { Customer } from "../models/Customer";
 
 // error-handling
+import { CustomerNotFoundByCpfError } from "./errors/customer-not-found-by-cpf-error";
 
 // interfaces
 interface IGetCustomerProfileUseCaseRequest {
@@ -25,7 +26,7 @@ export class GetCustomerProfileUseCase {
         const customer = await this.customersRepository.findById(customer_cpf);
 
         if (!customer?.id) {
-            throw new Error("Customer not found")
+            throw new CustomerNotFoundByCpfError();
         }
 
         return {

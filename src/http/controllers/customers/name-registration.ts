@@ -6,6 +6,11 @@ import { z } from 'zod';
 // use-cases
 import { makeCustomerRegistrationNameUseCase } from "../../../use-cases/factories/make-customer-registration-name-use-case";
 
+// error-handling
+import { CustomerRegistrationNotFoundError } from '../../../use-cases/errors/customer-registration-session-not-found-error';
+import { InvalidNameError } from '../../../use-cases/errors/invalid-name-error';
+import { InvalidCustomerRegistrationStepError } from '../../../use-cases/errors/wrong-customer-registration-step-error';
+
 export async function nameRegistration(request: FastifyRequest, reply: FastifyReply) {
 
     try {
@@ -32,7 +37,25 @@ export async function nameRegistration(request: FastifyRequest, reply: FastifyRe
 
     } catch (err) {
 
-        console.log(err);
+        if (err instanceof CustomerRegistrationNotFoundError) {
+            return reply
+                .status(404)
+                .send({ message: "Registration not found. Start customer registration process" });
+        }
+
+        if (err instanceof InvalidNameError) {
+            return reply
+                .status(400)
+                .send({ message: "First name and/or last name are too short. " });
+        }
+
+        if (err instanceof InvalidCustomerRegistrationStepError) {
+            return reply
+                .status(400)
+                .send({ message: "Wrong registration step" });
+        }
+
+        reply.status(400).send({ message: "Error finding customer", error: err });
 
     }
 }

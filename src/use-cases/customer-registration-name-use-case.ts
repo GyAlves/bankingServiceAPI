@@ -3,6 +3,9 @@
 import { ICustomersRepository } from "../repositories/customers-repository-interface";
 
 // error-handling
+import { CustomerRegistrationNotFoundError } from "./errors/customer-registration-session-not-found-error";
+import { InvalidNameError } from "./errors/invalid-name-error";
+import { InvalidCustomerRegistrationStepError } from "./errors/wrong-customer-registration-step-error";
 
 // interfaces
 interface ICustomerRegistrationNameRequest {
@@ -20,20 +23,25 @@ export class CustomerRegistrationNameUseCase {
         const [session] = await this.customersRepository.findRegistrationBySessionId(session_id);
 
         if (!session.sessionId) {
-            throw new Error("Registration not found")
+            throw new CustomerRegistrationNotFoundError()
         }
 
         const isNameRegistrationStep = session.customer_registration_step === "0";
 
         if (!isNameRegistrationStep) {
-            throw new Error("Wrong registration step")
+            throw new InvalidCustomerRegistrationStepError();
         }
 
         const validFirstName = first_name.length < 3 ? false : first_name.toLowerCase();
+
+        if (!validFirstName) {
+            throw new InvalidNameError()
+        }
+
         const validLastName = last_name.length < 3 ? false : last_name.toLowerCase();
 
-        if (!validFirstName || !validLastName) {
-            throw new Error("Invalid first and/or last name")
+        if (!validLastName) {
+            throw new InvalidNameError()
         }
 
         const customerRegistration = {
