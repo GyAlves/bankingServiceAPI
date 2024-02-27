@@ -6,10 +6,12 @@ import { FastifyInstance } from "fastify";
 import { profile } from "./profile";
 import { startRegistration } from "./start-registration";
 import { nameRegistration } from "./name-registration";
+import { birthDateRegistration } from "./birth-date-registration";
 
 
 export async function CustomersRouter(app: FastifyInstance) {
     app.get("/profile", profile);
     app.post("/start_registration", startRegistration);
     app.patch("/name_registration", nameRegistration);
+    app.patch("/birth_date_registration", birthDateRegistration);
 }

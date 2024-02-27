@@ -11,7 +11,7 @@ export class CustomerStartRegistration implements ICustomerStartRegistration {
         public first_name?: string,
         public last_name?: string,
         public email?: string,
-        public birth_date?: Date,
+        public birth_date?: string,
         public password?: string,
     ) { }
 }

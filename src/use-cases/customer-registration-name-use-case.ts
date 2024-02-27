@@ -29,6 +29,7 @@ export class CustomerRegistrationNameUseCase {
         const isNameRegistrationStep = session.customer_registration_step === "0";
 
         if (!isNameRegistrationStep) {
+
             throw new InvalidCustomerRegistrationStepError();
         }
 
@@ -41,6 +42,9 @@ export class CustomerRegistrationNameUseCase {
         const validLastName = last_name.length < 3 ? false : last_name.toLowerCase();
 
         if (!validLastName) {
+
+            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed" });
+
             throw new InvalidNameError()
         }
 
@@ -48,6 +52,8 @@ export class CustomerRegistrationNameUseCase {
             customer_registration_step: "1",
             first_name: validFirstName,
             last_name: validLastName,
+            customer_registration_status: "inProgress",
+            sessionId: session_id
         }
 
         await this.customersRepository.updateCustomerRegistration(customerRegistration);

@@ -4,33 +4,32 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 // use-cases
-import { makeCustomerRegistrationNameUseCase } from "../../../use-cases/factories/make-customer-registration-name-use-case";
+import { makeCustomerRegistrationBirthdateUseCase } from "../../../use-cases/factories/make-customer-registration-birth-date-use-case";
 
 // error-handling
 import { CustomerRegistrationNotFoundError } from '../../../use-cases/errors/customer-registration-session-not-found-error';
-import { InvalidNameError } from '../../../use-cases/errors/invalid-name-error';
 import { InvalidCustomerRegistrationStepError } from '../../../use-cases/errors/wrong-customer-registration-step-error';
+import { CustomerIsUnderAgeError } from '../../../use-cases/errors/customer-is-under-age-error';
 
-export async function nameRegistration(request: FastifyRequest, reply: FastifyReply) {
+export async function birthDateRegistration(request: FastifyRequest, reply: FastifyReply) {
 
     try {
 
-        const customerNameRegistration = makeCustomerRegistrationNameUseCase();
+        const customerBirthdateRegistration = makeCustomerRegistrationBirthdateUseCase();
 
-        const registerCustomerNameSchema = z.object({
-            first_name: z.string(),
-            last_name: z.string(),
+        const registerCustomerBirthdateSchema = z.object({
+            birth_date: z.string()
         });
 
         const session_id = request.cookies.sessionId || "";
 
-        const { first_name, last_name } = registerCustomerNameSchema.parse(request.body);
+        const { birth_date } = registerCustomerBirthdateSchema.parse(request.body);
 
-        await customerNameRegistration.execute({ first_name, last_name, session_id });
+        await customerBirthdateRegistration.execute({ birth_date, session_id });
 
         return reply.status(200).send(
             {
-                message: "Customer name registration completed successfully",
+                message: "Customer birth date registration completed successfully",
                 session_id
             }
         );
@@ -43,10 +42,10 @@ export async function nameRegistration(request: FastifyRequest, reply: FastifyRe
                 .send({ message: "Registration not found. Start customer registration process" });
         }
 
-        if (err instanceof InvalidNameError) {
+        if (err instanceof CustomerIsUnderAgeError) {
             return reply
                 .status(400)
-                .send({ message: "First name and/or last name are too short. " });
+                .send({ message: "Customer is under age" });
         }
 
         if (err instanceof InvalidCustomerRegistrationStepError) {
@@ -54,9 +53,8 @@ export async function nameRegistration(request: FastifyRequest, reply: FastifyRe
                 .status(400)
                 .send({ message: "Wrong registration step" });
         }
-        console.log(err);
 
-        reply.status(400).send({ message: "Error finding customer", error: err });
+        reply.status(400).send({ message: "Error registering customer", error: err });
 
     }
 }
