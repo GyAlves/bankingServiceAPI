@@ -56,7 +56,7 @@ export async function nameRegistration(request: FastifyRequest, reply: FastifyRe
         }
         console.log(err);
 
-        reply.status(400).send({ message: "Error finding customer", error: err });
+        reply.status(400).send({ message: "Error registering customer name", error: err });
 
     }
 }
