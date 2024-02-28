@@ -43,7 +43,7 @@ export class CustomerRegistrationNameUseCase {
 
         if (!validLastName) {
 
-            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed" });
+            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed", sessionId: session.sessionId });
 
             throw new InvalidNameError()
         }

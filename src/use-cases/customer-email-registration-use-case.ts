@@ -22,13 +22,15 @@ export class CustomerEmailRegistrationUseCase {
 
     async execute({ email, session_id }: ICustomerEmailRegistrationRequest): Promise<void> {
 
-        const [session] = await this.customersRepository.findRegistrationBySessionId(session_id);
+        const session = await this.customersRepository.findRegistrationBySessionId(session_id);
 
-        if (!session.sessionId) {
+        if (!(session.length > 0)) {
             throw new CustomerRegistrationNotFoundError()
         }
 
-        const isEmailRegistrationStep = session.customer_registration_step === "2";
+        const { customer_registration_step } = session[0];
+
+        const isEmailRegistrationStep = customer_registration_step === "2";
 
         if (!isEmailRegistrationStep) {
 
@@ -39,7 +41,7 @@ export class CustomerEmailRegistrationUseCase {
 
         if (!isValidEmail) {
 
-            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed" });
+            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed", sessionId: session_id });
 
             throw new InvalidEmailError();
         }

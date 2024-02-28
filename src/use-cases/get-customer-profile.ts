@@ -14,7 +14,7 @@ interface IGetCustomerProfileUseCaseRequest {
 }
 
 interface IGetCustomerProfileUseCaseResponse {
-    customer: Customer | null
+    customer: Customer[] | []
 }
 
 export class GetCustomerProfileUseCase {
@@ -23,15 +23,13 @@ export class GetCustomerProfileUseCase {
 
     async execute({ customer_cpf }: IGetCustomerProfileUseCaseRequest): Promise<IGetCustomerProfileUseCaseResponse> {
 
-        const customer = await this.customersRepository.findById(customer_cpf);
+        const customer = await this.customersRepository.findCustomerByCpf(customer_cpf);
 
-        if (!customer?.id) {
+        if (!(customer.length > 0)) {
             throw new CustomerNotFoundByCpfError();
         }
 
-        return {
-            customer
-        }
+        return { customer }
 
     }
 }

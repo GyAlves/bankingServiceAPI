@@ -22,15 +22,17 @@ export class CustomerRegistrationBirthdateUseCase {
 
     async execute({ birth_date, session_id }: ICustomerRegistrationBirthdateRequest): Promise<void> {
 
-        const [session] = await this.customersRepository.findRegistrationBySessionId(session_id);
+        const session = await this.customersRepository.findRegistrationBySessionId(session_id);
 
-        if (!session.sessionId) {
+        if (!(session.length > 0)) {
             throw new CustomerRegistrationNotFoundError()
         }
 
-        const isBirthdateRegistrationStep = session.customer_registration_step === "1";
+        const { customer_registration_step } = session[0];
 
-        if (!isBirthdateRegistrationStep) {
+        const isBirthDateRegistrationStep = customer_registration_step === "1";
+
+        if (!isBirthDateRegistrationStep) {
 
             throw new InvalidCustomerRegistrationStepError();
         }
@@ -42,7 +44,7 @@ export class CustomerRegistrationBirthdateUseCase {
 
         if (!isAdult) {
 
-            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed" });
+            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed", sessionId: session_id });
 
             throw new CustomerIsUnderAgeError();
         }

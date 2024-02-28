@@ -4,14 +4,14 @@ import knex from '../../database/database.config';
 
 // models 
 import { Customer } from "../../models/Customer";
-import { CustomerStartRegistration } from "../../models/CustomerStartRegistration";
+import { CustomerRegistration } from "../../models/CustomerStartRegistration";
 
 // repositories
 import { ICustomersRepository } from '../customers-repository-interface'
 
 export class KnexCustomersRepository implements ICustomersRepository {
 
-    async findById(id: string): Promise<Customer | any> {
+    async findById(id: string): Promise<Customer[] | []> {
 
         const query = knex("customers").select();
 
@@ -31,13 +31,13 @@ export class KnexCustomersRepository implements ICustomersRepository {
 
     }
 
-    async customerRegistration(registration: CustomerStartRegistration): Promise<void> {
+    async customerStartRegistration(registration: CustomerRegistration): Promise<number[]> {
 
-        await knex("start-customer-registration").insert(registration);
-
+        const customerRegistration = await knex("start-customer-registration").insert(registration);
+        return customerRegistration;
     }
 
-    async findRegistrationBySessionId(session_id: string | null): Promise<CustomerStartRegistration[] | []> {
+    async findRegistrationBySessionId(session_id: string | null): Promise<CustomerRegistration[] | []> {
 
         const query = knex("start-customer-registration").select();
 
@@ -47,12 +47,13 @@ export class KnexCustomersRepository implements ICustomersRepository {
 
     }
 
-    async updateCustomerRegistration(registration: CustomerStartRegistration): Promise<void> {
+    async updateCustomerRegistration(registration: CustomerRegistration): Promise<void> {
 
-        await knex("start-customer-registration").where("sessionId", "=", registration.sessionId).update(registration);
+        const sessionId = registration.sessionId || "";
+
+        await knex("start-customer-registration").where("sessionId", "=", sessionId).update(registration);
 
     }
-
 
     async createCustomer(customer: Customer): Promise<number[]> {
 

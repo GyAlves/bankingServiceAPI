@@ -1,5 +1,5 @@
 // dependencies
-import { randomUUID } from 'crypto';
+import { UUID, randomUUID } from 'crypto';
 
 // repositories
 import { ICustomersRepository } from "../repositories/customers-repository-interface";
@@ -12,15 +12,19 @@ interface IGetCustomerProfileUseCaseRequest {
     customer_cpf: string
 }
 
+interface IStartCustomerRegistrationUseCaseResponse {
+    sessionId: string
+}
+
 export class StartCustomerRegistrationUseCase {
 
     constructor(private customersRepository: ICustomersRepository) { }
 
-    async execute({ customer_cpf }: IGetCustomerProfileUseCaseRequest): Promise<string> {
+    async execute({ customer_cpf }: IGetCustomerProfileUseCaseRequest): Promise<IStartCustomerRegistrationUseCaseResponse> {
 
-        const customer = await this.customersRepository.findById(customer_cpf);
+        const customer = await this.customersRepository.findCustomerByCpf(customer_cpf);
 
-        if (customer?.id) {
+        if (!(customer.length > 0)) {
             throw new CustomerNotFoundByCpfError();
         }
 
@@ -32,8 +36,10 @@ export class StartCustomerRegistrationUseCase {
             customer_registration_status: "inProgress",
         }
 
-        await this.customersRepository.customerRegistration(startRegistration);
+        await this.customersRepository.customerStartRegistration(startRegistration);
 
-        return startRegistration.sessionId;
+        const sessionId = startRegistration.sessionId;
+
+        return { sessionId };
     }
 }

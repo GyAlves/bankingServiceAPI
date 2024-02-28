@@ -16,19 +16,33 @@ interface ICreateCustomerRequest {
     session_id: string
 }
 
+interface ICreateCustomerResponse {
+    customer: number[]
+}
+
 export class CreateCustomerUseCase {
 
     constructor(private customersRepository: ICustomersRepository) { }
 
-    async execute({ session_id }: ICreateCustomerRequest): Promise<number[]> {
+    async execute({ session_id }: ICreateCustomerRequest): Promise<ICreateCustomerResponse> {
 
-        const [session] = await this.customersRepository.findRegistrationBySessionId(session_id);
+        const session = await this.customersRepository.findRegistrationBySessionId(session_id);
 
-        if (!session.sessionId) {
+        if (!(session.length > 0)) {
             throw new CustomerRegistrationNotFoundError()
         }
 
-        const customerCpf = `${session.customer_cpf}`;
+        const {
+            customer_cpf,
+            customer_registration_step,
+            customer_registration_status,
+            birth_date,
+            email,
+            first_name,
+            last_name
+        } = session[0];
+
+        const customerCpf = `${customer_cpf}`;
 
         const customerAlreadyExists = await this.customersRepository.findCustomerByCpf(customerCpf);
 
@@ -36,33 +50,33 @@ export class CreateCustomerUseCase {
             throw new CustomerAlreadyExistsError();
         }
 
-        const isFinalRegistrationStep = session.customer_registration_step === "3";
+        const isFinalRegistrationStep = customer_registration_step === "3";
 
         if (!isFinalRegistrationStep) {
 
             throw new InvalidCustomerRegistrationStepError();
         }
 
-        const isRegistrationProcessValid = session.customer_registration_status === "readyForRegistration";
+        const isRegistrationProcessValid = customer_registration_status === "readyForRegistration";
 
         if (!isRegistrationProcessValid && !isFinalRegistrationStep) {
 
-            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed" });
+            await this.customersRepository.updateCustomerRegistration({ customer_registration_status: "failed", sessionId: session_id });
 
             throw new CustomerRegistrationFailedError();
         }
 
         const createCustomer = {
             id: randomUUID(),
-            first_name: session.first_name,
-            last_name: session.last_name,
-            email: session.email,
-            cpf: session.customer_cpf,
-            birth_date: session.birth_date,
+            first_name: first_name,
+            last_name: last_name,
+            email: email,
+            cpf: customer_cpf,
+            birth_date: birth_date,
         }
 
         const customer = await this.customersRepository.createCustomer(createCustomer);
 
-        return customer;
+        return { customer };
     }
 }

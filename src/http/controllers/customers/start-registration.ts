@@ -4,12 +4,12 @@ import { FastifyReply, FastifyRequest } from 'fastify';
 import { z } from 'zod';
 
 // use-cases
-import { makeStartCustomerRegistrationUseCase } from "../../../use-cases/factories/make-start-customer-registation-use-case";
+import { makeStartCustomerRegistrationUseCase } from "../../../use-cases/factories/make-start-customer-registration-use-case";
 
 // error-handling
 import { CustomerNotFoundByCpfError } from '../../../use-cases/errors/customer-not-found-by-cpf-error';
 
-export async function startRegistration(request: FastifyRequest, reply: FastifyReply) {
+export async function startCustomerRegistration(request: FastifyRequest, reply: FastifyReply) {
 
     try {
 
@@ -21,14 +21,13 @@ export async function startRegistration(request: FastifyRequest, reply: FastifyR
 
         const { cpf } = registerCustomerCpfSchema.parse(request.body);
 
-        const sessionId = await startCustomerRegistration.execute({ customer_cpf: cpf });
+        const { sessionId } = await startCustomerRegistration.execute({ customer_cpf: cpf });
 
         reply.cookie("sessionId", sessionId);
 
         return reply.status(200).send(
             {
-                message: "Customer registration initialized",
-                cookies: request.cookies.sessionId
+                message: "Customer registration initialized"
             }
         );
 

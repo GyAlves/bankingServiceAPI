@@ -19,7 +19,7 @@ export async function customer(request: FastifyRequest, reply: FastifyReply) {
 
         const session_id = request.cookies.sessionId || "";
 
-        const customer = await createCustomer.execute({ session_id });
+        const { customer } = await createCustomer.execute({ session_id });
 
         return reply.status(200).send({ message: "Customer created successfully", customer });
 
@@ -30,7 +30,7 @@ export async function customer(request: FastifyRequest, reply: FastifyReply) {
         }
 
         if (err instanceof CustomerAlreadyExistsError) {
-            return reply.status(404).send({ message: "Customer already exists" });
+            return reply.status(400).send({ message: "Customer already exists" });
         }
 
         if (err instanceof InvalidCustomerRegistrationStepError) {
