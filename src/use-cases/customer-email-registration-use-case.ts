@@ -46,7 +46,7 @@ export class CustomerEmailRegistrationUseCase {
 
         const customerBirthRegistration = {
             customer_registration_step: "3",
-            customer_registration_status: "inProgress",
+            customer_registration_status: "readyForRegistration",
             email,
             sessionId: session_id
         }

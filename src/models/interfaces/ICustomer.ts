@@ -6,6 +6,5 @@ export default interface Customer {
     birth_date: Date,
     cpf: number,
     email: string,
-    account_id: string,
-    created_at: Date
+    account_id?: string,
 }

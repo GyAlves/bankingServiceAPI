@@ -1,7 +1,6 @@
 
 // interfaces
 import ICustomer from "./interfaces/ICustomer";
-
 export class Customer implements ICustomer {
     constructor(
         public id: string,
@@ -10,7 +9,6 @@ export class Customer implements ICustomer {
         public birth_date: Date,
         public cpf: number,
         public email: string,
-        public account_id: string,
-        public created_at: Date
+        public account_id?: string,
     ) { }
 }

@@ -21,6 +21,16 @@ export class KnexCustomersRepository implements ICustomersRepository {
 
     }
 
+    async findCustomerByCpf(cpf: string): Promise<Customer[] | []> {
+
+        const query = knex("customers").select();
+
+        const customer = await query.where("cpf", "=", cpf).select("*");
+
+        return customer;
+
+    }
+
     async customerRegistration(registration: CustomerStartRegistration): Promise<void> {
 
         await knex("start-customer-registration").insert(registration);
@@ -40,6 +50,13 @@ export class KnexCustomersRepository implements ICustomersRepository {
     async updateCustomerRegistration(registration: CustomerStartRegistration): Promise<void> {
 
         await knex("start-customer-registration").where("sessionId", "=", registration.sessionId).update(registration);
+
+    }
+
+
+    async createCustomer(customer: Customer): Promise<number[]> {
+
+        return await knex("customers").insert(customer);
 
     }
 }
